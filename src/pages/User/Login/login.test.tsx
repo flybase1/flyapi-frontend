@@ -1,9 +1,4 @@
-﻿import { render, fireEvent, act } from '@testing-library/react';
-import React from 'react';
-import { TestBrowser } from '@@/testBrowser';
-
-// @ts-ignore
-import { startMock } from '@@/requestRecordMock';
+﻿// @ts-ignore
 
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {

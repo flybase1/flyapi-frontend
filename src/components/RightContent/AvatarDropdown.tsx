@@ -1,13 +1,12 @@
 import { outLogin } from '@/services/ant-design-pro/api';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { userLogoutUsingPOST } from '@/services/flyapi_backend/userController';
+import { LogoutOutlined,SettingOutlined,UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { history, useModel } from '@umijs/max';
+import { history,useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import React, { useCallback } from 'react';
-import { flushSync } from 'react-dom';
-import HeaderDropdown from '../HeaderDropdown';
+
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -16,8 +15,8 @@ export type GlobalHeaderRightProps = {
 
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState || {};
-  return <span className="anticon">{currentUser?.name}</span>;
+  const { loginUser } = initialState || {};
+  return <span className="anticon">{loginUser?.userName}</span>;
 };
 
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, children }) => {
@@ -64,7 +63,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         flushSync(() => {
           setInitialState((s) => ({ ...s, currentUser: undefined }));
         });
-        loginOut();
+        userLogoutUsingPOST();
         return;
       }
       history.push(`/account/${key}`);
@@ -88,9 +87,9 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     return loading;
   }
 
-  const { currentUser } = initialState;
+  const { loginUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!loginUser || !loginUser.userName) {
     return loading;
   }
 

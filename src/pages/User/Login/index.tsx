@@ -1,26 +1,10 @@
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
-import { getFakeCaptcha } from '@/services/ant-design-pro/login';
-import {
-  AlipayCircleOutlined,
-  LockOutlined,
-  MobileOutlined,
-  TaobaoCircleOutlined,
-  UserOutlined,
-  WeiboCircleOutlined,
-} from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormCaptcha,
-  ProFormCheckbox,
-  ProFormText,
-} from '@ant-design/pro-components';
+
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
-import { Alert, message, Tabs } from 'antd';
+import { FormattedMessage,Helmet,history,SelectLang,useIntl,useModel } from '@umijs/max';
+import { Alert,message,Tabs } from 'antd';
+import React,{ useState } from 'react';
 import Settings from '../../../../config/defaultSettings';
-import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -95,43 +79,38 @@ const Login: React.FC = () => {
       height: '100vh',
       overflow: 'auto',
       backgroundImage:
-        'url(\'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr\')',
+        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
       backgroundSize: '100% 100%',
     };
   });
 
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
-    }
-  };
+  /*  const fetchUserInfo = async () => {
+      const userInfo = await initialState?.fetchUserInfo?.();
+      if (userInfo) {
+        flushSync(() => {
+          setInitialState((s) => ({
+            ...s,
+            currentUser: userInfo,
+          }));
+        });
+      }
+    };*/
 
-  const handleSubmit = async (values: API.LoginParams) => {
+  const handleSubmit = async (values: API.UserLoginRequest) => {
     try {
       // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: '登录成功！',
-        });
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
+      const res = await userLoginUsingPOST({ ...values });
+      if (res.data) {
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
+        setInitialState({
+          loginUser: res.data,
+        });
         return;
       }
-      console.log(msg);
       // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -166,22 +145,22 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
-          subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          // logo={<img alt="logo" src="../../../picture/avatar.jpg" />}
+          title="Fly API"
+          subTitle={intl.formatMessage({ id: '欢迎各位前来' })}
           initialValues={{
             autoLogin: true,
           }}
-          actions={[
-            <FormattedMessage
-              key="loginWith"
-              id="pages.login.loginWith"
-              defaultMessage="其他登录方式"
-            />,
-            <ActionIcons key="icons" />,
-          ]}
+          /*          actions={[
+                      <FormattedMessage
+                        key="loginWith"
+                        id="pages.login.loginWith"
+                        defaultMessage="其他登录方式"
+                      />,
+                      <ActionIcons key="icons" />,
+                    ]}*/
           onFinish={async (values) => {
-            await handleSubmit(values as API.LoginParams);
+            await handleSubmit(values as API.UserLoginRequest);
           }}
         >
           <Tabs
@@ -217,14 +196,14 @@ const Login: React.FC = () => {
           {type === 'account' && (
             <>
               <ProFormText
-                name="username"
+                name="userAccount"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
+                  defaultMessage: '用户名: ',
                 })}
                 rules={[
                   {
@@ -238,15 +217,16 @@ const Login: React.FC = () => {
                   },
                 ]}
               />
+
               <ProFormText.Password
-                name="password"
+                name="userPassword"
                 fieldProps={{
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: ant.design',
+                  defaultMessage: '密码: ',
                 })}
                 rules={[
                   {
@@ -353,6 +333,9 @@ const Login: React.FC = () => {
             <ProFormCheckbox noStyle name="autoLogin">
               <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
             </ProFormCheckbox>
+            <span />
+            <a href={'/user/register'}>注册新用户</a>
+            <span />
             <a
               style={{
                 float: 'right',

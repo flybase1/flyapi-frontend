@@ -83,3 +83,15 @@ export async function removeRule(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+/** 注册 POST /api/user/register */
+export async function register(body: API.UserRegisterRequest, options?: { [key: string]: any }) {
+  return request<API.UserRegisterRequest>('/api/user/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
