@@ -1,10 +1,5 @@
-import Footer from '@/components/Footer';
-
+import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { FormattedMessage,Helmet,history,SelectLang,useIntl,useModel } from '@umijs/max';
-import { Alert,message,Tabs } from 'antd';
-import React,{ useState } from 'react';
-import Settings from '../../../../config/defaultSettings';
 
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -79,37 +74,44 @@ const Login: React.FC = () => {
       height: '100vh',
       overflow: 'auto',
       backgroundImage:
-        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+        'url(\'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr\')',
       backgroundSize: '100% 100%',
     };
   });
 
   const intl = useIntl();
 
-  /*  const fetchUserInfo = async () => {
-      const userInfo = await initialState?.fetchUserInfo?.();
-      if (userInfo) {
-        flushSync(() => {
-          setInitialState((s) => ({
-            ...s,
-            currentUser: userInfo,
-          }));
-        });
-      }
-    };*/
+  /*    const fetchUserInfo = async () => {
+        const userInfo = await initialState?.fetchUserInfo?.();
+        if (userInfo) {
+          flushSync(() => {
+            setInitialState((s) => ({
+              ...s,
+              currentUser: userInfo,
+            }));
+          });
+        }
+      };*/
 
-  const handleSubmit = async (values: API.UserLoginRequest) => {
-    try {
-      // 登录
-      const res = await userLoginUsingPOST({ ...values });
-      if (res.data) {
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+  const fectchUserInfo = (userInfo: API.UserVo) => {
+    if (userInfo) {
+      flushSync(() => {
         setInitialState({
-          loginUser: res.data,
-        });
-        return;
-      }
+          loginUser: userInfo
+          'url(\'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr\')'
+          try {
+            // 登录
+            const res = await userLoginUsingPOST({ ...values });
+            if(res.data);
+        {
+          const defaultLoginSuccessMessage = '登录成功！';
+          message.success(defaultLoginSuccessMessage);
+          const urlParams = new URL(window.location.href).searchParams;
+          history.push(urlParams.get('redirect') || '/');
+          //setTimeout(() => setInitialState({ loginUser: res.data }), 2000);
+          fectchUserInfo(res.data);
+          return;
+        }
       // 如果失败去设置用户错误信息
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
@@ -340,6 +342,8 @@ const Login: React.FC = () => {
               style={{
                 float: 'right',
               }}
+
+              href={'/user/forgetPassword'}
             >
               <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
             </a>

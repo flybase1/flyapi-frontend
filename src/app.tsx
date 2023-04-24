@@ -1,10 +1,5 @@
-import Footer from '@/components/Footer';
-
-import { SettingDrawer } from '@ant-design/pro-components';
-import type { RunTimeLayoutConfig } from '@umijs/max';
-import { history,Link } from '@umijs/max';
-import { AvatarDropdown,AvatarName } from './components/RightContent/AvatarDropdown';
-import { requestConfig } from './requestConfig';
+import { getLoginUserUsingGET } from '@/services/flyapi_backend/userController';
+import { history } from '@umijs/max';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -17,6 +12,13 @@ export async function getInitialState(): Promise<InitialState> {
   const state: InitialState = {
     loginUser: undefined,
   };
+
+  if (
+    window.location.pathname === '/user/register' ||
+    window.location.pathname === '/user/forgetPassword'
+  ) {
+    return state;
+  }
 
   try {
     const res = await getLoginUserUsingGET();
@@ -34,6 +36,7 @@ export async function getInitialState(): Promise<InitialState> {
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
+    layout: 'mix',
     actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
     avatarProps: {
       src: initialState?.loginUser?.userAvatar,
@@ -49,11 +52,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     onPageChange: () => {
       const { location } = history;
       const whiteList = ['/user/register', loginPath];
-      if (whiteList.includes(location.pathname)) {
+      if (whiteList.includes(history.location.pathname)) {
         return;
       }
-      // 如果没有登录，重定向到 login
-      if (!initialState?.loginUser && location.pathname !== loginPath) {
+      // 如果没有登录，重定向到 login    && location.pathname != loginPath && location.pathname!=home
+      if (!initialState?.loginUser) {
         history.push(loginPath);
       }
     },
@@ -79,11 +82,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
     links: isDev
       ? [
-        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-          <LinkOutlined />
-          <span>OpenAPI 文档</span>
-        </Link>,
-      ]
+          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+            <LinkOutlined />
+            <span>OpenAPI 文档</span>
+          </Link>,
+        ]
       : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面

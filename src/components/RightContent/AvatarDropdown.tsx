@@ -1,11 +1,9 @@
-import { outLogin } from '@/services/ant-design-pro/api';
+
 import { userLogoutUsingPOST } from '@/services/flyapi_backend/userController';
 import { LogoutOutlined,SettingOutlined,UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history,useModel } from '@umijs/max';
 import { Spin } from 'antd';
-import { stringify } from 'querystring';
-import type { MenuInfo } from 'rc-menu/lib/interface';
 
 
 export type GlobalHeaderRightProps = {
@@ -60,13 +58,15 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     (event: MenuInfo) => {
       const { key } = event;
       if (key === 'logout') {
-        flushSync(() => {
-          setInitialState((s) => ({ ...s, currentUser: undefined }));
-        });
+        setInitialState((s) => ({ ...s, currentUser: undefined }));
         userLogoutUsingPOST();
+        window.location.reload(); // 在退出登录后重新加载页面
+        return;
+      } else if (key === 'settings') {
+        history.push(`/user/Settings`);
         return;
       }
-      history.push(`/account/${key}`);
+      history.push(`/user/login`);
     },
     [setInitialState],
   );
@@ -111,6 +111,11 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         },
       ]
       : []),
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: '个人设置',
+    },
     {
       key: 'logout',
       icon: <LogoutOutlined />,

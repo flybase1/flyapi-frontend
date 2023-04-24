@@ -117,4 +117,8 @@ export namespace API {
     /** example: admin */
     currentAuthority: string;
   };
+
+  export interface InterfaceInfo {}
+
+  export interface UserVo {}
 }
